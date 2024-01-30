@@ -88,7 +88,7 @@ class AdaptationModel(Model):
                         "location":"location",
                         # ... other reporters ...
                         }
-        #set up the data collector 
+        #set up the data collector
         self.datacollector = DataCollector(model_reporters=model_metrics, agent_reporters=agent_metrics)
             
 
@@ -144,6 +144,7 @@ class AdaptationModel(Model):
             self.flood_map)
 
     def total_adapted_households(self):
+        #NOTE Change considering that the adaptation is not 0 or 1 
         """Return the total number of households that have adapted."""
         #BE CAREFUL THAT YOU MAY HAVE DIFFERENT AGENT TYPES SO YOU NEED TO FIRST CHECK IF THE AGENT IS ACTUALLY A HOUSEHOLD AGENT USING "ISINSTANCE"
         adapted_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_adapted])

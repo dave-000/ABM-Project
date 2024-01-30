@@ -55,11 +55,12 @@ class Households(Agent):
         return len(friends)
 
     def step(self):
+        #NOTE modify with our processes
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
         if self.flood_damage_estimated > 0.15 and random.random() < 0.2:
             self.is_adapted = True  # Agent adapts to flooding
-        
+
 # Define the Government agent class
 class Government(Agent):
     """
