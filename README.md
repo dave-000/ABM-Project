@@ -1,3 +1,23 @@
+## NOTE - group project
+The mesa model might give you problems, with the error message:
+
+FutureWarning: The AgentSet is experimental. It may be changed or removed in any and all future releases, including patch releases.
+We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1919       
+  self._agents: AgentSet = AgentSet(agents, model)
+
+If that is the case, go inside the environment folder, look for the mesa library packages, find the "agent.py" script, and comment line 118-125, they should be these lines:
+
+if not self.__class__.agentset_experimental_warning_given:
+   self.__class__.agentset_experimental_warning_given = True
+   warnings.warn(
+       "The AgentSet is experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
+       "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1919",
+       FutureWarning,
+       stacklevel=2,
+   )
+
+Once they are commented, everything should work.
+
 ## Flood Adaptation - minimal mesa model
 
 ### Introduction

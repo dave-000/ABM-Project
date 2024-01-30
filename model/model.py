@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 import random
 
 # Import the agent class(es) from agents.py
-from agents import Households
+from model.agents import Households
 
 # Import functions from functions.py
-from functions import get_flood_map_data, calculate_basic_flood_damage
-from functions import map_domain_gdf, floodplain_gdf
+from model.functions import get_flood_map_data, calculate_basic_flood_damage
+from model.functions import map_domain_gdf, floodplain_gdf
 
 
 # Define the AdaptationModel class
@@ -125,9 +125,9 @@ class AdaptationModel(Model):
         """
         # Define paths to flood maps
         flood_map_paths = {
-            'harvey': r'../input_data/floodmaps/Harvey_depth_meters.tif',
-            '100yr': r'../input_data/floodmaps/100yr_storm_depth_meters.tif',
-            '500yr': r'../input_data/floodmaps/500yr_storm_depth_meters.tif'  # Example path for 500yr flood map
+            'harvey': "input_data/floodmaps/Harvey_depth_meters.tif",
+            '100yr': "input_data/floodmaps/100yr_storm_depth_meters.tif",
+            '500yr': "input_data/floodmaps/500yr_storm_depth_meters.tif"  # Example path for 500yr flood map
         }
 
         # Throw a ValueError if the flood map choice is not in the dictionary
