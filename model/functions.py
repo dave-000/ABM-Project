@@ -143,7 +143,7 @@ def get_position_flood(bound_l, bound_r, bound_t, bound_b, img, seed):
     row, col = img.index(x, y)
     return x, y, row, col
 
-def calculate_basic_flood_damage(flood_depth):
+def calculate_basic_flood_damage(agent, flood_depth):
     """
     To get flood damage based on flood depth of household
     from de Moer, Huizinga (2017) with logarithmic regression over it.
@@ -158,10 +158,26 @@ def calculate_basic_flood_damage(flood_depth):
     flood_damage : damage factor between 0 and 1
     """
     if flood_depth >= 6:
-        flood_damage = 1
-    elif flood_depth < 0.025:
+        flood_depth = 6
+    if (flood_depth-6*agent.total_adaptation_level) < 0.025:
         flood_damage = 0
     else:
         # see flood_damage.xlsx for function generation
-        flood_damage = 0.1746 * math.log(flood_depth) + 0.6483
+        flood_damage = 0.1746 * math.log(flood_depth-6*agent.total_adaptation_level) + 0.6483
     return flood_damage
+
+def calculate_influenced_risk_profile(model):
+    influenced_risk_profile_vector = []
+    for i in range(model.number_of_households):
+        new_risk_profile = model.agents[i].risk_profile
+        friends = model.agents[i].get_friends(1)
+        for friend in friends:
+            new_risk_profile += 0.5 / len(friends) * model.trust_matrix[i, friend] * (model.agents[friend].risk_profile - model.agents[i].risk_profile)
+        
+        if new_risk_profile > 1:
+            new_risk_profile = 1
+        if new_risk_profile < 0:
+            new_risk_profile = 0
+
+        influenced_risk_profile_vector.append(new_risk_profile)
+    return influenced_risk_profile_vector

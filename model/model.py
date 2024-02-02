@@ -8,12 +8,13 @@ import geopandas as gpd
 import rasterio as rs
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 # Import the agent class(es) from agents.py
-from model.agents import Households
+from model.agents import Households, Government
 
 # Import functions from functions.py
-from model.functions import get_flood_map_data, calculate_basic_flood_damage
+from model.functions import get_flood_map_data, calculate_basic_flood_damage, calculate_influenced_risk_profile
 from model.functions import map_domain_gdf, floodplain_gdf
 
 
@@ -24,7 +25,7 @@ class AdaptationModel(Model):
     simulates their behavior, and collects data. The network type can be adjusted based on study requirements.
     """
 
-    def __init__(self, 
+    def __init__(self,
                  seed = 1,
                  number_of_households = 25, # number of household agents
                  # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
@@ -39,13 +40,16 @@ class AdaptationModel(Model):
                  number_of_edges = 3,
                  # number of nearest neighbours for WS social network
                  number_of_nearest_neighbours = 5,
+                 # government type
+                 government_type = "democratic"
                  ):
-        
+
         super().__init__(seed = seed)
-        
+
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         self.seed = seed
+        random.seed(self.seed)
 
         # network
         self.network = network # Type of network to be created
@@ -55,8 +59,19 @@ class AdaptationModel(Model):
 
         # generating the graph according to the network used and the network parameters specified
         self.G = self.initialize_network()
+
         # create grid out of network graph
         self.grid = NetworkGrid(self.G)
+
+        #Initialize wealth
+        self.initialize_wealth()
+
+        #Initialize expectation to authority
+        self.initialize_expectation_authority()
+
+        #Initialize risk profile
+        self.initialize_risk_profile()
+        self.next_risk_profile = np.zeros(self.number_of_households)
 
         # Initialize maps
         self.initialize_maps(flood_map_choice)
@@ -69,6 +84,19 @@ class AdaptationModel(Model):
             household = Households(unique_id=i, model=self)
             self.schedule.add(household)
             self.grid.place_agent(agent=household, node_id=node)
+        
+        # create government through initiating one Government object
+        government = Government(unique_id = 0, model = self, gov_type = government_type)
+        self.schedule.add(government)
+
+        # Builds the trust matrix
+        self.trust_matrix = np.random.normal(0.5, 0.4, size = (number_of_households, number_of_households))
+        for i in range(number_of_households):
+            for j in range(number_of_households):
+                if self.trust_matrix[i,j] > 1:
+                    self.trust_matrix[i,j] = 1
+                if self.trust_matrix[i,j] < -1:
+                    self.trust_matrix[i,j] = -1
 
         # You might want to create other agents here, e.g. insurance agents.
 
@@ -90,7 +118,7 @@ class AdaptationModel(Model):
                         }
         #set up the data collector
         self.datacollector = DataCollector(model_reporters=model_metrics, agent_reporters=agent_metrics)
-            
+
 
     def initialize_network(self):
         """
@@ -118,6 +146,71 @@ class AdaptationModel(Model):
                             f"Currently implemented network types are: "
                             f"'erdos_renyi', 'barabasi_albert', 'watts_strogatz', and 'no_network'")
 
+    def initialize_wealth(self):
+        distribution_vector = np.random.randint(100, size=(self.number_of_households))
+        wealth_vector = []
+        for i in range(self.number_of_households):
+            wealth_value = np.random.normal(1, 0.05)
+            if distribution_vector[i] < 71:
+                wealth_value = np.random.normal(0.75, 0.05)
+            if distribution_vector[i] < 58:
+                wealth_value = np.random.normal(0.5, 0.05)
+            if distribution_vector[i] <40:
+                wealth_value = np.random.normal(0.25, 0.05)
+            if distribution_vector[i] < 22:
+                wealth_value = np.random.normal(0, 0.05)
+
+            if wealth_value < 0:
+                wealth_value = 0
+            if wealth_value > 1:
+                wealth_value = 1
+            wealth_vector.append(wealth_value)
+        self.wealth_distribution = wealth_vector
+
+
+    def initialize_expectation_authority(self):
+        distribution_vector = np.random.randint(100, size=(self.number_of_households))
+        expectation_vector = []
+        for i in range(self.number_of_households):
+            expectation_value = np.random.normal(1, 0.05)
+            if distribution_vector[i] < 88:
+                expectation_value = np.random.normal(0.75, 0.05)
+            if distribution_vector[i] < 66:
+                expectation_value = np.random.normal(0.5, 0.05)
+            if distribution_vector[i] < 43:
+                expectation_value = np.random.normal(0.25, 0.05)
+            if distribution_vector[i] < 30:
+                expectation_value = np.random.normal(0, 0.05)
+
+            if expectation_value < 0:
+                expectation_value = 0
+            if expectation_value > 1:
+                expectation_value = 1
+            expectation_vector.append(expectation_value)
+        self.expectation_authority_distribution = expectation_vector
+
+
+    def initialize_risk_profile(self):
+        distribution_vector = np.random.randint(100, size=(self.number_of_households))
+        risk_profile_vector = []
+        for i in range(self.number_of_households):
+            risk_value = np.random.normal(0.85, 0.05)
+            if distribution_vector[i] < 87:
+                risk_value = np.random.normal(0.725, 0.05)
+            if distribution_vector[i] < 84:
+                risk_value = np.random.normal(0.6, 0.05)
+            if distribution_vector[i] < 45:
+                risk_value = np.random.normal(0.3, 0.05)
+
+            if np.random.rand() < 0.3:
+                risk_value += np.random.normal(0.4, 0.05)
+            if risk_value < 0:
+                risk_value = 0
+            if risk_value > 1:
+                risk_value = 1
+            risk_profile_vector.append(risk_value)
+        self.risk_profile_distribution = risk_profile_vector
+
 
     def initialize_maps(self, flood_map_choice):
         """
@@ -144,12 +237,12 @@ class AdaptationModel(Model):
             self.flood_map)
 
     def total_adapted_households(self):
-        #NOTE Change considering that the adaptation is not 0 or 1 
+        #NOTE Change considering that the adaptation is not 0 or 1
         """Return the total number of households that have adapted."""
         #BE CAREFUL THAT YOU MAY HAVE DIFFERENT AGENT TYPES SO YOU NEED TO FIRST CHECK IF THE AGENT IS ACTUALLY A HOUSEHOLD AGENT USING "ISINSTANCE"
-        adapted_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_adapted])
+        adapted_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households)])
         return adapted_count
-    
+
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()
         # Plot the model domain
@@ -183,13 +276,20 @@ class AdaptationModel(Model):
         assume local flooding instead of global flooding). The actual flood depth can be 
         estimated differently
         """
+
+        #Calculates the updated risk profile (NOTE, the risk profile are updated with the new values only at the END of the step)
+        self.next_risk_profile = calculate_influenced_risk_profile(self)
+
         if self.schedule.steps == 5:
             for agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
                 agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
                 # calculate the actual flood damage given the actual flood depth
-                agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
-        
+                agent.flood_damage_actual = calculate_basic_flood_damage(agent, agent.flood_depth_actual)
+
         # Collect data and advance the model by one step
         self.datacollector.collect(self)
         self.schedule.step()
+
+        for i in range(self.number_of_households):
+            self.agents[i].risk_profile = self.next_risk_profile[i]
