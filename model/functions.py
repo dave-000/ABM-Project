@@ -5,7 +5,6 @@
 Functions that are used in the model_file.py and agent.py for the running of the Flood Adaptation Model.
 Functions get called by the Model and Agent class.
 """
-import random
 import numpy as np
 import math
 from shapely import contains_xy
@@ -30,8 +29,8 @@ def set_initial_values(input_data, parameter, seed):
     parameter_set = 0
     parameter_data = input_data.loc[(input_data.parameter == parameter)] # get the distribution of values for the specified parameter
     parameter_data = parameter_data.reset_index()
-    random.seed(seed)
-    random_parameter = random.randint(0,100)
+    np.random.seed(seed)
+    random_parameter = np.random.randint(0,100)
     for i in range(len(parameter_data)):
         if i == 0:
             if random_parameter < parameter_data['value_for_input'][i]:
@@ -96,8 +95,8 @@ def generate_random_location_within_map_domain():
     """
     while True:
         # generate random location coordinates within square area of map domain
-        x = random.uniform(map_minx, map_maxx)
-        y = random.uniform(map_miny, map_maxy)
+        x = np.random.uniform(map_minx, map_maxx)
+        y = np.random.uniform(map_miny, map_maxy)
         # check if the point is within the polygon, if so, return the coordinates
         if contains_xy(map_domain_polygon, x, y):
             return x, y
@@ -137,9 +136,8 @@ def get_position_flood(bound_l, bound_r, bound_t, bound_b, img, seed):
     x, y: location on the map
     row, col: location within the tif-file
     """
-    random.seed(seed)
-    x = random.randint(round(bound_l, 0), round(bound_r, 0))
-    y = random.randint(round(bound_b, 0), round(bound_t, 0))
+    x = np.random.randint(round(bound_l, 0), round(bound_r, 0))
+    y = np.random.randint(round(bound_b, 0), round(bound_t, 0))
     row, col = img.index(x, y)
     return x, y, row, col
 

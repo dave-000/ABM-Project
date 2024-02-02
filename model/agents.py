@@ -1,5 +1,4 @@
 # Importing necessary libraries
-import random
 from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
@@ -83,8 +82,11 @@ class Households(Agent):
             self.total_adaptation_level = 1
         else:
             self.total_adaptation_level += increased_adaptation
+        self.adaptive_capacity -= 0.1 * self.adaptiveDC #Simulate the expense of resources caused by adaptation
 
         self.flood_damage_estimated = calculate_basic_flood_damage(self, flood_depth=(self.flood_depth_estimated - self.total_adaptation_level*6))
+
+
 
 # Define the Government agent class
 class Government(Agent):

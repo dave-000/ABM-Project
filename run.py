@@ -1,6 +1,6 @@
 from model.model import AdaptationModel
 
-random_seed = 42
+random_seed = 420
 households_number = 25
 flood_map = 'harvey'
 network_type = 'watts_strogatz'

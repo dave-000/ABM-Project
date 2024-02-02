@@ -7,7 +7,6 @@ from mesa.datacollection import DataCollector
 import geopandas as gpd
 import rasterio as rs
 import matplotlib.pyplot as plt
-import random
 import numpy as np
 
 # Import the agent class(es) from agents.py
@@ -49,7 +48,7 @@ class AdaptationModel(Model):
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         self.seed = seed
-        random.seed(self.seed)
+        np.random.seed(self.seed)
 
         # network
         self.network = network # Type of network to be created
@@ -283,7 +282,7 @@ class AdaptationModel(Model):
         if self.schedule.steps == 5:
             for agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
-                agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
+                agent.flood_depth_actual = np.random.uniform(0.5, 1.2) * agent.flood_depth_estimated
                 # calculate the actual flood damage given the actual flood depth
                 agent.flood_damage_actual = calculate_basic_flood_damage(agent, agent.flood_depth_actual)
 
