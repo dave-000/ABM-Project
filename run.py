@@ -1,5 +1,4 @@
 from model.model import AdaptationModel
-from numpy import random
 
 random_seed = 42
 households_number = 25
@@ -16,6 +15,5 @@ model_autocratic = AdaptationModel(seed=random_seed, number_of_households=househ
 model_democratic = AdaptationModel(seed=random_seed, number_of_households=households_number, flood_map_choice=flood_map, network=network_type, probability_of_network_connection=prob_network_connection, number_of_edges=num_of_edges, number_of_nearest_neighbours=num_of_nearest_neighbours, government_type=government_type2)
 
 for i in range(5):
-    print(model_autocratic.agents[3].risk_profile)
-    print(i)
-    model_autocratic.step()
+    print("iteration number " + str(i))
+    model_democratic.step()
