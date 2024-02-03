@@ -113,10 +113,7 @@ class Government(Agent):
         if self.gives_subsidies is True:
             for i in range(self.model.number_of_households):
                 if self.model.agents[i].adaptive_capacity < 0.2:
-                    print(self.model.agents[i].adaptive_capacity)
                     self.model.agents[i].adaptive_capacity += 0.1
-                    print("subsid given")
-                    print(self.model.agents[i].adaptive_capacity)
         
         #PSA
         if self.gives_PSA is True:

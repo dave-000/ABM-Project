@@ -1,10 +1,10 @@
 # Importing necessary libraries
 import networkx as nx
-from mesa import Model, Agent
+from mesa import Model #, Agent
 from mesa.time import RandomActivation
 from mesa.space import NetworkGrid
 from mesa.datacollection import DataCollector
-import geopandas as gpd
+#import geopandas as gpd
 import rasterio as rs
 import matplotlib.pyplot as plt
 import numpy as np
@@ -47,6 +47,7 @@ class AdaptationModel(Model):
 
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
+        self.government_type = government_type
         self.seed = seed
         np.random.seed(self.seed)
 
@@ -168,24 +169,39 @@ class AdaptationModel(Model):
 
 
     def initialize_expectation_authority(self):
-        distribution_vector = np.random.randint(100, size=(self.number_of_households))
         expectation_vector = []
-        for i in range(self.number_of_households):
-            expectation_value = np.random.normal(1, 0.05)
-            if distribution_vector[i] < 88:
-                expectation_value = np.random.normal(0.75, 0.05)
-            if distribution_vector[i] < 66:
-                expectation_value = np.random.normal(0.5, 0.05)
-            if distribution_vector[i] < 43:
-                expectation_value = np.random.normal(0.25, 0.05)
-            if distribution_vector[i] < 30:
-                expectation_value = np.random.normal(0, 0.05)
+        if self.government_type == "democratic":
+            distribution_vector = np.random.randint(100, size=(self.number_of_households))
+            for i in range(self.number_of_households):
+                expectation_value = np.random.normal(1, 0.05)
+                if distribution_vector[i] < 88:
+                    expectation_value = np.random.normal(0.75, 0.05)
+                if distribution_vector[i] < 66:
+                    expectation_value = np.random.normal(0.5, 0.05)
+                if distribution_vector[i] < 43:
+                    expectation_value = np.random.normal(0.25, 0.05)
+                if distribution_vector[i] < 30:
+                    expectation_value = np.random.normal(0, 0.05)
 
-            if expectation_value < 0:
-                expectation_value = 0
-            if expectation_value > 1:
-                expectation_value = 1
-            expectation_vector.append(expectation_value)
+                if expectation_value < 0:
+                    expectation_value = 0
+                if expectation_value > 1:
+                    expectation_value = 1
+                expectation_vector.append(expectation_value)
+        
+        elif self.government_type == "autocratic":
+            for i in range(self.number_of_households):
+                expectation_value = np.random.normal(0.85, 0.1)
+                
+                if expectation_value > 1:
+                    expectation_value = 1
+                if expectation_value < 0:
+                    expectation_value = 0
+                expectation_vector.append(expectation_value)
+
+        else:
+            print("Unknown government type")
+
         self.expectation_authority_distribution = expectation_vector
 
 
@@ -280,11 +296,12 @@ class AdaptationModel(Model):
         self.next_risk_profile = calculate_influenced_risk_profile(self)
 
         if self.schedule.steps == 5:
-            for agent in self.schedule.agents:
+            print("Flood happening!")
+            for i in range(self.number_of_households): #agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
-                agent.flood_depth_actual = np.random.uniform(0.5, 1.2) * agent.flood_depth_estimated
+                self.agents[i].flood_depth_actual = np.random.uniform(0.5, 1.2) * self.agents[i].flood_depth_estimated
                 # calculate the actual flood damage given the actual flood depth
-                agent.flood_damage_actual = calculate_basic_flood_damage(agent, agent.flood_depth_actual)
+                self.agents[i].flood_damage_actual = calculate_basic_flood_damage(self.agents[i], self.agents[i].flood_depth_actual)
 
         # Collect data and advance the model by one step
         self.datacollector.collect(self)
