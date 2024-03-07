@@ -10,6 +10,8 @@ num_of_nearest_neighbours = 5
 government_type1 = "autocratic"
 government_type2 = "democratic"
 
+#NOTE add possibility to have more control over the policies
+
 #Creates the two models
 model_autocratic = AdaptationModel(seed=random_seed, number_of_households=households_number, flood_map_choice=flood_map, network=network_type, probability_of_network_connection=prob_network_connection, number_of_edges=num_of_edges, number_of_nearest_neighbours=num_of_nearest_neighbours, government_type=government_type1)
 model_democratic = AdaptationModel(seed=random_seed, number_of_households=households_number, flood_map_choice=flood_map, network=network_type, probability_of_network_connection=prob_network_connection, number_of_edges=num_of_edges, number_of_nearest_neighbours=num_of_nearest_neighbours, government_type=government_type2)

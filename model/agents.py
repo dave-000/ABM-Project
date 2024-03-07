@@ -75,7 +75,7 @@ class Households(Agent):
         #NOTE modify with our processes
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
-        self.adaptiveDC = (self.risk_profile + self.expectation_authority + self.flood_damage_estimated)/3
+        self.adaptiveDC = (self.risk_profile + (1-self.expectation_authority) + self.flood_damage_estimated)/3
         increased_adaptation = self.adaptiveDC * self.adaptive_capacity
 
         if (self.total_adaptation_level + increased_adaptation) > 1:
