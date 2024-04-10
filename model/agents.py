@@ -20,6 +20,7 @@ class Households(Agent):
 
         #Sets richness of agent
         self.adaptive_capacity = model.wealth_distribution[unique_id]
+        self.wealth_type = model.wealth_distribution_type[unique_id]
 
         #Set expectation of autority
         self.expectation_authority = model.expectation_authority_distribution[unique_id]
@@ -75,16 +76,18 @@ class Households(Agent):
         #NOTE modify with our processes
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
-        self.adaptiveDC = (self.risk_profile + (1-self.expectation_authority) + self.flood_damage_estimated)/3
+        self.adaptiveDC = (self.risk_profile + (1-self.expectation_authority) + self.flood_damage_estimated/235000)/3
         increased_adaptation = self.adaptiveDC * self.adaptive_capacity
 
         if (self.total_adaptation_level + increased_adaptation) > 1:
             self.total_adaptation_level = 1
         else:
             self.total_adaptation_level += increased_adaptation
-        self.adaptive_capacity -= 0.1 * self.adaptiveDC #Simulate the expense of resources caused by adaptation
-
-        self.flood_damage_estimated = calculate_basic_flood_damage(self, flood_depth=(self.flood_depth_estimated - self.total_adaptation_level*6))
+        self.adaptive_capacity -= 0.2 * self.adaptiveDC #Simulate the expense of resources caused by adaptation
+        
+        if self.adaptive_capacity < 0:
+            self.adaptive_capacity = 0
+        self.flood_damage_estimated = calculate_basic_flood_damage(self, flood_depth=(self.flood_depth_estimated))
 
 
 
@@ -93,30 +96,43 @@ class Government(Agent):
     """
     A government agent that currently doesn't perform any actions.
     """
-    def __init__(self, unique_id, model, gov_type):
+    def __init__(self, unique_id, model, subsidies_type, psa_type):
         super().__init__(unique_id, model)
         self.unique_id = unique_id
         self.model = model
-        self.government_type = gov_type
-        
-        if gov_type == "democratic":
-            self.gives_subsidies = True
-            self.gives_PSA = True
-        elif gov_type == "autocratic":
-            self.gives_subsidies = False
-            self.gives_PSA = False
-        else:
-            print("Unrecognised type of government")
+        self.subsidies_type = subsidies_type
+        self.psa_type = psa_type
 
     def step(self):
         #Subsidies
-        if self.gives_subsidies is True:
+        if self.subsidies_type == "strong":
+            for i in range(self.model.number_of_households):
+                if self.model.agents[i].adaptive_capacity < 0.3:
+                    self.model.agents[i].adaptive_capacity += 0.2
+        elif self.subsidies_type == "weak":
             for i in range(self.model.number_of_households):
                 if self.model.agents[i].adaptive_capacity < 0.2:
                     self.model.agents[i].adaptive_capacity += 0.1
+        elif self.subsidies_type == "none":
+            for i in range(self.model.number_of_households):
+                if self.model.agents[i].adaptive_capacity < 0.3:
+                    self.model.agents[i].adaptive_capacity += 0
+        else:
+            print("Unknown subsidies policy, possible types are 'strong', 'weak' and 'none' ")
         
         #PSA
-        if self.gives_PSA is True:
+        if self.psa_type == "strong":
+            for i in range(self.model.number_of_households):
+                self.model.agents[i].expectation_authority += 0.2
+                self.model.agents[i].risk_profile += 0.2
+                
+                #Ensure no out of bound value
+                if self.model.agents[i].expectation_authority > 1:
+                    self.model.agents[i].expectation_authority = 1
+                if self.model.agents[i].risk_profile > 1:
+                    self.model.agents[i].risk_profile = 1
+        
+        elif self.psa_type == "weak":
             for i in range(self.model.number_of_households):
                 self.model.agents[i].expectation_authority += 0.1
                 self.model.agents[i].risk_profile += 0.1
@@ -126,5 +142,10 @@ class Government(Agent):
                     self.model.agents[i].expectation_authority = 1
                 if self.model.agents[i].risk_profile > 1:
                     self.model.agents[i].risk_profile = 1
-
+        
+        if self.psa_type == "none":
+            for i in range(self.model.number_of_households):
+                self.model.agents[i].expectation_authority += 0
+                self.model.agents[i].risk_profile += 0
+                
 # More agent classes can be added here, e.g. for insurance agents.

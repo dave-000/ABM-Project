@@ -10,6 +10,8 @@ import math
 from shapely import contains_xy
 from shapely import prepare
 import geopandas as gpd
+import matplotlib.pyplot as plt
+import os
 
 def set_initial_values(input_data, parameter, seed):
     """
@@ -162,7 +164,7 @@ def calculate_basic_flood_damage(agent, flood_depth):
     else:
         # see flood_damage.xlsx for function generation
         flood_damage = 0.1746 * math.log(flood_depth-6*agent.total_adaptation_level) + 0.6483
-    return flood_damage
+    return flood_damage * 235000
 
 def calculate_influenced_risk_profile(model):
     influenced_risk_profile_vector = []
@@ -179,3 +181,135 @@ def calculate_influenced_risk_profile(model):
 
         influenced_risk_profile_vector.append(new_risk_profile)
     return influenced_risk_profile_vector
+
+def generate_dictionary():
+    results1 = {}
+    results1["predicted total damage"] = [0, 0, 0, 0, 0, 0]
+    results1["predicted average damage"] = [0, 0, 0, 0, 0, 0]
+    results1["average adaptation level"] = [0, 0, 0, 0, 0, 0]
+    results1["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
+    results1["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
+    results1["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+
+    results2 = {}
+    results2["predicted total damage"] = [0, 0, 0, 0, 0, 0]
+    results2["predicted average damage"] = [0, 0, 0, 0, 0, 0]
+    results2["average adaptation level"] = [0, 0, 0, 0, 0, 0]
+    results2["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
+    results2["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
+    results2["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+
+    results3 = {}
+    results3["predicted total damage"] = [0, 0, 0, 0, 0, 0]
+    results3["predicted average damage"] = [0, 0, 0, 0, 0, 0]
+    results3["average adaptation level"] = [0, 0, 0, 0, 0, 0]
+    results3["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
+    results3["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
+    results3["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+
+    results4 = {}
+    results4["predicted total damage"] = [0, 0, 0, 0, 0, 0]
+    results4["predicted average damage"] = [0, 0, 0, 0, 0, 0]
+    results4["average adaptation level"] = [0, 0, 0, 0, 0, 0]
+    results4["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
+    results4["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
+    results4["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+
+    results5 = {}
+    results5["predicted total damage"] = [0, 0, 0, 0, 0, 0]
+    results5["predicted average damage"] = [0, 0, 0, 0, 0, 0]
+    results5["average adaptation level"] = [0, 0, 0, 0, 0, 0]
+    results5["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
+    results5["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
+    results5["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+
+    results6 = {}
+    results6["predicted total damage"] = [0, 0, 0, 0, 0, 0]
+    results6["predicted average damage"] = [0, 0, 0, 0, 0, 0]
+    results6["average adaptation level"] = [0, 0, 0, 0, 0, 0]
+    results6["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
+    results6["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
+    results6["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+
+    return results1, results2, results3, results4, results5, results6
+
+
+def save_data(dictionary, model, tick, number_runs):
+    total_damage = 0
+    for i in range(model.number_of_households):
+        household = model.agents[i]
+        total_damage += household.flood_damage_estimated
+    dictionary["predicted total damage"][tick] += total_damage/number_runs
+    dictionary["predicted average damage"][tick] += total_damage/model.number_of_households/number_runs
+
+    average_adaptation_level = 0
+    for i in range(model.number_of_households):
+        household = model.agents[i]
+        average_adaptation_level += household.total_adaptation_level
+    dictionary["average adaptation level"][tick] += average_adaptation_level/model.number_of_households/number_runs
+    
+    number_of_adapted = 0
+    for i in range(model.number_of_households):
+        household = model.agents[i]
+        if household.total_adaptation_level >= household.flood_depth_estimated:
+            number_of_adapted += 1
+    dictionary["number of fully adapted agents"][tick] += number_of_adapted/number_runs
+
+    return dictionary
+
+
+def save_result_data(dictionary, model, tick, number_runs):
+    for i in range(5):
+        adaptation_level = 0
+        number_agents = 0
+        for j in range(model.number_of_households):
+            if model.agents[j].wealth_type == i:
+                adaptation_level += model.agents[j].total_adaptation_level
+                number_agents =+ 1
+        if number_agents > 0:
+            dictionary["average adaptation level per wealth"][i] += adaptation_level/number_agents/number_runs
+        else:
+            dictionary["average adaptation level per wealth"][i] += 0
+    
+    for i in range(6):
+        damage_level = 0
+        number_agents = 0
+        for j in range(model.number_of_households):
+            if model.agents[j].flood_depth_actual >= i and model.agents[j].flood_depth_actual < (i+1):
+                damage_level += model.agents[j].flood_damage_actual
+                number_agents += 1
+        if number_agents > 0:
+            dictionary["average damage per water depth"][i] += damage_level/number_agents/number_runs
+        else:
+            dictionary["average damage per water depth"][i] = 0
+    return dictionary
+
+
+def create_graphs(dictionary, folder_name, plot_names, x_names, y_names):
+    for i in range(6):
+        create_plot(dictionary[plot_names[i]], folder_name, plot_names[i], x_names[i], y_names[i])
+
+
+def create_plot(vector, save_folder, file_name, x_axis_name, y_axis_name):
+    plt.clf()
+    # Create x values for the plot
+    x_values = list(range(1, len(vector) + 1))
+    
+    # Plot the vector
+    plt.plot(x_values, vector, marker='o')
+    
+    # Set x-axis ticks
+    plt.xticks(x_values)
+    
+    # Set labels
+    plt.xlabel(x_axis_name)
+    plt.ylabel(y_axis_name)
+    plt.title(file_name)
+    
+    # Ensure folder exists
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+
+    # Save the plot as PNG
+    save_path = os.path.join(save_folder, file_name + '.png')
+    plt.savefig(save_path)

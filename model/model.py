@@ -39,15 +39,18 @@ class AdaptationModel(Model):
                  number_of_edges = 3,
                  # number of nearest neighbours for WS social network
                  number_of_nearest_neighbours = 5,
-                 # government type
-                 government_type = "democratic"
+                 # subsidies type
+                 subsidies_type = "none",
+                 # psa type
+                 psa_type = "none"
                  ):
 
         super().__init__(seed = seed)
 
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
-        self.government_type = government_type
+        self.subsidies_type = subsidies_type
+        self.psa_type = psa_type
         self.seed = seed
         np.random.seed(self.seed)
 
@@ -86,7 +89,7 @@ class AdaptationModel(Model):
             self.grid.place_agent(agent=household, node_id=node)
         
         # create government through initiating one Government object
-        government = Government(unique_id = 0, model = self, gov_type = government_type)
+        government = Government(unique_id = 0, model = self, subsidies_type=subsidies_type, psa_type=psa_type)
         self.schedule.add(government)
 
         # Builds the trust matrix
@@ -149,59 +152,51 @@ class AdaptationModel(Model):
     def initialize_wealth(self):
         distribution_vector = np.random.randint(100, size=(self.number_of_households))
         wealth_vector = []
+        type_wealth_vector = []
         for i in range(self.number_of_households):
             wealth_value = np.random.normal(1, 0.05)
+            wealth_type = 5
             if distribution_vector[i] < 71:
                 wealth_value = np.random.normal(0.75, 0.05)
+                wealth_type = 4
             if distribution_vector[i] < 58:
                 wealth_value = np.random.normal(0.5, 0.05)
+                wealth_type = 3
             if distribution_vector[i] <40:
                 wealth_value = np.random.normal(0.25, 0.05)
+                wealth_type = 2
             if distribution_vector[i] < 22:
                 wealth_value = np.random.normal(0, 0.05)
+                wealth_type = 1
 
             if wealth_value < 0:
                 wealth_value = 0
             if wealth_value > 1:
                 wealth_value = 1
             wealth_vector.append(wealth_value)
+            type_wealth_vector.append(wealth_type)
         self.wealth_distribution = wealth_vector
+        self.wealth_distribution_type = type_wealth_vector
 
 
     def initialize_expectation_authority(self):
         expectation_vector = []
-        if self.government_type == "democratic":
-            distribution_vector = np.random.randint(100, size=(self.number_of_households))
-            for i in range(self.number_of_households):
-                expectation_value = np.random.normal(1, 0.05)
-                if distribution_vector[i] < 88:
-                    expectation_value = np.random.normal(0.75, 0.05)
-                if distribution_vector[i] < 66:
-                    expectation_value = np.random.normal(0.5, 0.05)
-                if distribution_vector[i] < 43:
-                    expectation_value = np.random.normal(0.25, 0.05)
-                if distribution_vector[i] < 30:
-                    expectation_value = np.random.normal(0, 0.05)
-
-                if expectation_value < 0:
-                    expectation_value = 0
-                if expectation_value > 1:
-                    expectation_value = 1
-                expectation_vector.append(expectation_value)
-        
-        elif self.government_type == "autocratic":
-            for i in range(self.number_of_households):
-                expectation_value = np.random.normal(0.85, 0.1)
-                
-                if expectation_value > 1:
-                    expectation_value = 1
-                if expectation_value < 0:
-                    expectation_value = 0
-                expectation_vector.append(expectation_value)
-
-        else:
-            print("Unknown government type")
-
+        distribution_vector = np.random.randint(100, size=(self.number_of_households))
+        for i in range(self.number_of_households):
+            expectation_value = np.random.normal(1, 0.05)
+            if distribution_vector[i] < 88:
+                expectation_value = np.random.normal(0.75, 0.05)
+            if distribution_vector[i] < 66:
+                expectation_value = np.random.normal(0.5, 0.05)
+            if distribution_vector[i] < 43:
+                expectation_value = np.random.normal(0.25, 0.05)
+            if distribution_vector[i] < 30:
+                expectation_value = np.random.normal(0, 0.05)
+            if expectation_value < 0:
+                expectation_value = 0
+            if expectation_value > 1:
+                expectation_value = 1
+            expectation_vector.append(expectation_value)
         self.expectation_authority_distribution = expectation_vector
 
 
