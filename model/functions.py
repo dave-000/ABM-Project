@@ -66,8 +66,11 @@ def get_flood_map_data(flood_map):
     bound_b = flood_map.bounds.bottom
     return band, bound_l, bound_r, bound_t, bound_b
 
-shapefile_path = "input_data\\model_domain\\houston_model\\houston_model.shp"
-floodplain_path = "input_data\\floodplain\\floodplain_area.shp"
+shapefile_path = "input_data/model_domain/houston_model/houston_model.shp"
+floodplain_path = "input_data/floodplain/floodplain_area.shp"
+
+# shapefile_path = "input_data\\model_domain\\houston_model\\houston_model.shp"
+# floodplain_path = "input_data\\floodplain\\floodplain_area.shp"
 
 #shapefile_path = "C:\\Users\\David\\Desktop\\final_project\\ABM-Project\\input_data\\model_domain\\houston_model\\houston_model.shp"
 #floodplain_path = "C:\\Users\\David\\Desktop\\final_project\\ABM-Project\\input_data\\floodplain\\floodplain_area.shp"
@@ -182,54 +185,54 @@ def calculate_influenced_risk_profile(model):
         influenced_risk_profile_vector.append(new_risk_profile)
     return influenced_risk_profile_vector
 
-def generate_dictionary():
+def generate_dictionary(num_of_ticks):
     results1 = {}
-    results1["predicted total damage"] = [0, 0, 0, 0, 0, 0]
-    results1["predicted average damage"] = [0, 0, 0, 0, 0, 0]
-    results1["average adaptation level"] = [0, 0, 0, 0, 0, 0]
-    results1["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
-    results1["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
-    results1["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+    results1["predicted total damage"] = [0] * num_of_ticks
+    results1["predicted average damage"] = [0] * num_of_ticks
+    results1["average adaptation level"] = [0] * num_of_ticks
+    results1["number of fully adapted agents"] = [0] * num_of_ticks
+    results1["average adaptation level per wealth"] = [0] * num_of_ticks
+    results1["average damage per water depth"] = [0] * num_of_ticks
 
     results2 = {}
-    results2["predicted total damage"] = [0, 0, 0, 0, 0, 0]
-    results2["predicted average damage"] = [0, 0, 0, 0, 0, 0]
-    results2["average adaptation level"] = [0, 0, 0, 0, 0, 0]
-    results2["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
-    results2["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
-    results2["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+    results2["predicted total damage"] = [0] * num_of_ticks
+    results2["predicted average damage"] = [0] * num_of_ticks
+    results2["average adaptation level"] = [0] * num_of_ticks
+    results2["number of fully adapted agents"] = [0] * num_of_ticks
+    results2["average adaptation level per wealth"] = [0] * num_of_ticks
+    results2["average damage per water depth"] = [0] * num_of_ticks
 
     results3 = {}
-    results3["predicted total damage"] = [0, 0, 0, 0, 0, 0]
-    results3["predicted average damage"] = [0, 0, 0, 0, 0, 0]
-    results3["average adaptation level"] = [0, 0, 0, 0, 0, 0]
-    results3["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
-    results3["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
-    results3["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+    results3["predicted total damage"] = [0] * num_of_ticks
+    results3["predicted average damage"] = [0] * num_of_ticks
+    results3["average adaptation level"] = [0] * num_of_ticks
+    results3["number of fully adapted agents"] = [0] * num_of_ticks
+    results3["average adaptation level per wealth"] = [0] * num_of_ticks
+    results3["average damage per water depth"] = [0] * num_of_ticks
 
     results4 = {}
-    results4["predicted total damage"] = [0, 0, 0, 0, 0, 0]
-    results4["predicted average damage"] = [0, 0, 0, 0, 0, 0]
-    results4["average adaptation level"] = [0, 0, 0, 0, 0, 0]
-    results4["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
-    results4["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
-    results4["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+    results4["predicted total damage"] = [0] * num_of_ticks
+    results4["predicted average damage"] = [0] * num_of_ticks
+    results4["average adaptation level"] = [0] * num_of_ticks
+    results4["number of fully adapted agents"] = [0] * num_of_ticks
+    results4["average adaptation level per wealth"] = [0] * num_of_ticks
+    results4["average damage per water depth"] = [0] * num_of_ticks
 
     results5 = {}
-    results5["predicted total damage"] = [0, 0, 0, 0, 0, 0]
-    results5["predicted average damage"] = [0, 0, 0, 0, 0, 0]
-    results5["average adaptation level"] = [0, 0, 0, 0, 0, 0]
-    results5["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
-    results5["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
-    results5["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+    results5["predicted total damage"] = [0] * num_of_ticks
+    results5["predicted average damage"] = [0] * num_of_ticks
+    results5["average adaptation level"] = [0] * num_of_ticks
+    results5["number of fully adapted agents"] = [0] * num_of_ticks
+    results5["average adaptation level per wealth"] = [0] * num_of_ticks
+    results5["average damage per water depth"] = [0] * num_of_ticks
 
     results6 = {}
-    results6["predicted total damage"] = [0, 0, 0, 0, 0, 0]
-    results6["predicted average damage"] = [0, 0, 0, 0, 0, 0]
-    results6["average adaptation level"] = [0, 0, 0, 0, 0, 0]
-    results6["number of fully adapted agents"] = [0, 0, 0, 0, 0, 0]
-    results6["average adaptation level per wealth"] = [0, 0, 0, 0, 0]
-    results6["average damage per water depth"] = [0, 0, 0, 0, 0, 0]
+    results6["predicted total damage"] = [0] * num_of_ticks
+    results6["predicted average damage"] = [0] * num_of_ticks
+    results6["average adaptation level"] = [0] * num_of_ticks
+    results6["number of fully adapted agents"] = [0] * num_of_ticks
+    results6["average adaptation level per wealth"] = [0] * num_of_ticks
+    results6["average damage per water depth"] = [0] * num_of_ticks
 
     return results1, results2, results3, results4, results5, results6
 
@@ -290,6 +293,11 @@ def create_graphs(dictionary, folder_name, plot_names, x_names, y_names):
         create_plot(dictionary[plot_names[i]], folder_name, plot_names[i], x_names[i], y_names[i])
 
 
+def create_combined_graph(list_of_dictionaries, folder_name, plot_names, x_names, y_names):
+
+    for plot_type in range(6):
+        create_combined_plot(plot_type, list_of_dictionaries, folder_name, plot_names[plot_type], x_names[plot_type], y_names[plot_type])
+
 def create_plot(vector, save_folder, file_name, x_axis_name, y_axis_name):
     plt.clf()
     # Create x values for the plot
@@ -312,4 +320,34 @@ def create_plot(vector, save_folder, file_name, x_axis_name, y_axis_name):
 
     # Save the plot as PNG
     save_path = os.path.join(save_folder, file_name + '.png')
+    plt.savefig(save_path)
+
+def create_combined_plot(plot_type, list_of_dictionaries, folder_name, plot_name, x_axis_name, y_axis_name):
+    plt.clf()
+
+    vectors = []
+    for dictionary in list_of_dictionaries:
+        vectors.append(dictionary[plot_name])
+
+    scenarios = ["no policies", "subsidies weak", "subsidies strong", "PSA weak", "PSA strong", "subsidies + PSA weak"]
+
+    # Create x values for the plot (assuming all vectors have the same length)
+    for i, vector in enumerate(vectors):
+        x_values = list(range(1, len(vector) + 1))
+        plt.plot(x_values, vector, label=f'Scenario {scenarios[i]}', marker='o')
+
+    # Set labels and title
+    plt.xlabel(x_axis_name)
+    plt.ylabel(y_axis_name)
+    plt.title(plot_name)
+
+    # Add legend
+    plt.legend()
+
+    # Ensure folder exists
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+
+    # Save the plot as PNG
+    save_path = os.path.join(folder_name, plot_name + '.png')
     plt.savefig(save_path)
